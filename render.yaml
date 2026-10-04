@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: MicroOCPP Simulator
+    env: docker
+    repo: https://github.com/Ramikaspa/MicroOcppSimulator222
+    branch: main
+    dockerfilePath: ./Dockerfile
+    
+    # Environment variables
+    envVars:
+      - key: PORT
+        value: 8000
+    
+    # Port configuration
+    ports:
+      - port: 8000
+        protocol: http
+    
+    # Build configuration
+    buildCommand: docker build -t microocpp-simulator:latest .
+    startCommand: ./build/mo_simulator
+    
+    # Resource configuration
+    plan: free
+    numInstances: 1
+    
+    # Auto-deploy on push to main
+    autoDeploy: true
+    
+    # Health check
+    healthCheckPath: /
+    healthCheckInterval: 30
