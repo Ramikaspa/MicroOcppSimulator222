@@ -12,9 +12,15 @@ RUN apk update && \
 # Set the working directory inside the container
 WORKDIR /MicroOcppSimulator
 
-# Clone the repository with all submodules
-RUN git clone --recurse-submodules https://github.com/Ramikaspa/MicroOcppSimulator222.git . && \
+# Clone the repository with all submodules (with retry for submodules)
+RUN git clone --recurse-submodules --depth=1 https://github.com/Ramikaspa/MicroOcppSimulator222.git . && \
+    git submodule update --init --recursive && \
     rm -rf .git
+
+# Verify submodules are present
+RUN ls -la lib/ && \
+    [ -d lib/MicroOcpp ] || (echo "MicroOcpp submodule missing" && exit 1) && \
+    [ -d lib/mbedtls ] || (echo "mbedtls submodule missing" && exit 1)
 
 # Build the project
 RUN cmake -S . -B ./build
