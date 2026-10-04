@@ -12,18 +12,19 @@ RUN apk update && \
 # Set the working directory inside the container
 WORKDIR /MicroOcppSimulator
 
-# Copy your application files to the container's working directory
-COPY . .
+# Clone the repository with all submodules
+RUN git clone --recurse-submodules https://github.com/Ramikaspa/MicroOcppSimulator222.git . && \
+    rm -rf .git
 
-RUN git submodule init && git submodule update
+# Build the project
 RUN cmake -S . -B ./build
-RUN cmake --build ./build -j 16 --target mo_simulator -j 16
+RUN cmake --build ./build -j 16 --target mo_simulator
 
-# Grant execute permissions to the shell script
+# Grant execute permissions
 RUN chmod +x /MicroOcppSimulator/build/mo_simulator
 
 # Expose port 8000
 EXPOSE 8000
 
-# Run the shell script inside the container
+# Run the simulator
 CMD ["./build/mo_simulator"]
